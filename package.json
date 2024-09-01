@@ -1,0 +1,19 @@
+{
+  "name": "bitrix-front",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/node": "^22.5.1",
+    "@types/resolve": "^1.20.6",
+    "handlebars": "^4.7.8",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.1"
+  }
+}
