@@ -23,7 +23,16 @@
     "types": [
       "node",
       "vite/client",
-    ]
+    ],
+    "paths": {
+      "@common/*": ["src/common/*"],
+      "@layouts/*": ["src/templates/layouts/*"],
+      "@sections/*": ["src/templates/sections/*"],
+      "@shared/*": ["src/templates/shared/*"],
+      "@media/*": ["public/media/*"],
+      "@fonts/*": ["public/fonts/*"],
+      "@jsHelpers/*": ["src/js/helpers/*"],
+    }
   },
-  "include": ["./src/**/*", "globals.d.ts"],
+  "include": ["src/**/*", "globals.d.ts"],
 }

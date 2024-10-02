@@ -1,7 +1,15 @@
+import {
+  getRollupInputFromDirectory,
+  setPathForAssetsFiles,
+  setPathForChunkJsFiles,
+  setPathForEntryJsFiles,
+} from "./system/actions";
 import { defineConfig, loadEnv } from 'vite';
 import { UserConfig } from 'vite';
-import {resolve} from "path";
-import {getRollupInputFromDirectory} from "./src/system/actions";
+import { resolve } from "path";
+import viteHandlebars from "./system/plugins/vite-handlebars";
+import liveReload from 'vite-plugin-live-reload'
+import viteRewriteUrlInCss from "./system/plugins/vite-rewrite-url-in-css";
 
 interface EnvFile {
   MODE: "development" | "production"
@@ -9,91 +17,66 @@ interface EnvFile {
   HOST: string
   DOMAIN: string
 }
-
-// function moveHtmlPlugin() {
-//   return {
-//     name: 'move-html-files',
-//     generateBundle(options, bundle) {
-//       // Редактируем HTML файлы в bundle
-//       Object.keys(bundle).forEach((fileName) => {
-//         console.log(fileName)
-//         if (fileName.endsWith('.html')) {
-//           const file = bundle[fileName];
-//           delete bundle[fileName];
-//           bundle[`renamed/${fileName}`] = file;
-//         }
-//       });
-//     }
-//   };
-// }
-
-
-// function customHtmlPathPlugin(newPathMap) {
-//   return {
-//     name: 'custom-html-path',
-//     configResolved(config) {
-//       const inputOptions = config.build.rollupOptions.input;
-//       for (const key in inputOptions) {
-//         // console.log(sep)
-//         // console.log(inputOptions[key])
-//         // console.log()
-//         // console.log(parse(inputOptions[key]))
-//         // console.log(newPathMap[key])
-//         if (newPathMap[key]) {
-//           inputOptions[key] = inputOptions[key].replace(`src${sep}app${sep}pages`, 'pages');
-//         }
-//       }
-//     }
-//   }
-// }
-
 export default defineConfig( ( configEnv ) => {
   const { mode } = configEnv;
 
   // @ts-ignore
   const env = loadEnv( mode, process.cwd(), '' ) as EnvFile
 
-  const input = getRollupInputFromDirectory(resolve(__dirname, 'pages'))
-
   const isDev = mode === 'development'
 
   const userConfig: UserConfig  = {
     plugins: [
+      liveReload( resolve(__dirname, 'src') ),
+      viteHandlebars({ partialsDir: resolve(__dirname, 'src', 'templates') }),
+      viteRewriteUrlInCss({ paths: { '/media': '../../media', '/fonts': '../../fonts' } })
     ],
+    base: './',
     server: {
-      cors: true,
+      cors: false,
       strictPort: true,
       port: +env.PORT,
-      open: 'pages/main/index.html',
-      // https: false,
+      hmr: true,
       origin: !isDev ? env.DOMAIN : undefined,
+      watch: {
+        usePolling: true,
+      }
     },
     build: {
+      outDir: resolve(__dirname, 'dist'),
       rollupOptions: {
-        input,
+        input: getRollupInputFromDirectory(resolve(__dirname, 'pages')),
         output: {
-          assetFileNames: ( assetInfo ) => {
-            console.log(assetInfo)
-            // @ts-ignore
-            let extType = assetInfo.name.split( '.' )[ 1 ];
-
-            if ( /png|jpe?g|svg|gif|tiff|bmp|ico/i.test( extType ) ) {
-              extType = 'img';
-            }
-
-            if ( /css|scss/i.test( extType ) ) {
-              extType = 'css';
-            }
-
-            if ( extType === 'css' ) {
-              return `${ extType }/[name].[hash][extname]`;
-            }
-
-            return `assets/${ extType }/[name].[hash][extname]`;
-          },
+          entryFileNames: setPathForEntryJsFiles,
+          chunkFileNames: setPathForChunkJsFiles,
+          assetFileNames: setPathForAssetsFiles,
         }
       },
-    }
+    },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          // additionalData: `@import "@common/styles/settings";`,
+        },
+      },
+    },
+    resolve: {
+      alias: {
+        "/src": resolve(process.cwd(), "src"),
+        "@common": resolve(__dirname, 'src', 'common'),
+        "@layouts": resolve(__dirname, 'src', 'templates', 'layouts'),
+        "@sections": resolve(__dirname, 'src', 'templates', 'sections'),
+        "@shared": resolve(__dirname, 'src', 'templates', 'shared'),
+        "@media": resolve(__dirname, 'public', 'media'),
+        "@fonts": resolve(__dirname, 'public', 'fonts'),
+        "@jsHelpers": resolve(__dirname, 'src', 'js', 'helpers'),
+      },
+    },
+  }
+
+  if ( isDev ) {
+    userConfig.root = 'pages/main'
+    userConfig.publicDir = '../../public'
   }
 
   return userConfig;

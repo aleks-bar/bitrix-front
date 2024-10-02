@@ -1,1 +1,0 @@
-import "../../public/js/pages/main/index"
