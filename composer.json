@@ -8,5 +8,12 @@
       "name": "Aleksander Bardin",
       "email": "sergalexbard@gmail.com"
     }
-  ]
+  ],
+  "scripts": {
+    "post-create-project-cmd": [
+      "php -r \"copy('.env.example', '.env');\"",
+      "npm install",
+      "npm run dev"
+    ]
+  }
 }
