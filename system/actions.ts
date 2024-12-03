@@ -79,13 +79,14 @@ export const setPathForChunkJsFiles = (chunkInfo: PreRenderedChunk): string => {
 export const setPathForAssetsFiles = (chunkInfo: PreRenderedAsset): string => {
   // @ts-ignore
   let extType = chunkInfo.name.split( '.' )[ 1 ];
-  let pathToPages = 'pages/'
+  // let pathToPages = 'pages/'
+  const pathToMedia = 'public/assets/media'
 
   if ( /png|jpe?g|svg|webp|gif|tiff|bmp|ico/i.test( extType ) ) {
-    if ( chunkInfo.originalFileName?.startsWith('public/media/images/') ) {
+    if ( chunkInfo.originalFileName?.startsWith(`${pathToMedia}/images/`) ) {
       extType = 'images';
     }
-    if ( chunkInfo.originalFileName?.startsWith('public/media/icons/') ) {
+    if ( chunkInfo.originalFileName?.startsWith(`${pathToMedia}/icons/`) ) {
       extType = 'icons';
     }
   }
@@ -98,23 +99,22 @@ export const setPathForAssetsFiles = (chunkInfo: PreRenderedAsset): string => {
     extType = 'css';
   }
 
-  if ( extType === 'css' && chunkInfo.originalFileName && chunkInfo.originalFileName.includes(pathToPages) ) {
-    const pageName = basename(dirname(chunkInfo.originalFileName))
-    return `${pathToPages + pageName}/[name].[hash][extname]`
+  if ( extType === 'css' ) {
+    return `assets/css/[name].[hash][extname]`
   }
 
   if ( extType === 'images' || extType === 'icons' ) {
-    return `media/${extType}/[name][extname]`
+    return `assets/media/${extType}/[name][extname]`
   }
 
   if ( extType === 'fonts' && chunkInfo.originalFileName ) {
     const assetDirectory = basename(dirname(chunkInfo.originalFileName))
 
     return assetDirectory === 'fonts' ?
-      `fonts/[name][extname]` : `fonts/${assetDirectory}/[name][extname]`
+      `assets/fonts/[name][extname]` : `assets/fonts/${assetDirectory}/[name][extname]`
   }
 
-  return '[name][extname]'
+  return 'assets/[name][extname]'
 }
 
 export const firstCharToUpper = (word: string) => {

@@ -40,6 +40,11 @@ export default function viteRewriteUrlInCss({ paths }: viteRewriteUrlInCssOption
                   const quotes = matchValues[ 1 ]
                   const pathAfterPattern = matchValues[ 2 ].split( oldPath )[ 1 ]
 
+                  if (fileName.includes('assets/')) {
+                    const pathName = oldPath.split('/').filter(Boolean)[0]
+                    return `url(${ quotes + `../${pathName}` + pathAfterPattern + quotes })`;
+                  }
+
                   return `url(${ quotes + paths[ oldPath ] + pathAfterPattern + quotes })`;
                 }
               }

@@ -29,24 +29,28 @@ export const getPartialName = (
   return basename(dirname(locallyPath))
 }
 
-export async function registerPartials(directoryPath: string, partialsMap: TPartials) {
+export async function registerPartials(directoryPathes: string | string[], partialsMap: TPartials) {
 
   try {
-    const partials = getFilesRecursively(directoryPath, '.hbs')
-    const normalizedDirectoryPath = normalizePath(directoryPath);
+    const pathes = typeof directoryPathes === 'string' ? [directoryPathes] : directoryPathes
 
-    partials.forEach(partialPath => {
-      let partialLocallyPath = partialPath.replace(normalizedDirectoryPath, '')
-      partialLocallyPath = partialLocallyPath.startsWith('/') ? partialLocallyPath.replace('/', '') : partialLocallyPath
+    pathes.forEach(directoryPath => {
+      const partials = getFilesRecursively(directoryPath, '.hbs')
+      const normalizedDirectoryPath = normalizePath(directoryPath);
 
-      const partialNameOptions: GetPartialNameOptions = {
-        locallyPath: partialLocallyPath
-      }
+      partials.forEach(partialPath => {
+        let partialLocallyPath = partialPath.replace(normalizedDirectoryPath, '')
+        partialLocallyPath = partialLocallyPath.startsWith('/') ? partialLocallyPath.replace('/', '') : partialLocallyPath
 
-      const partialName = getPartialName(partialNameOptions)
-      const content = readFileSync(partialPath, { encoding: 'utf8' })
-      partialsMap.set(partialName, partialPath)
-      handlebars.registerPartial(partialName, content)
+        const partialNameOptions: GetPartialNameOptions = {
+          locallyPath: partialLocallyPath
+        }
+
+        const partialName = getPartialName(partialNameOptions)
+        const content = readFileSync(partialPath, { encoding: 'utf8' })
+        partialsMap.set(partialName, partialPath)
+        handlebars.registerPartial(partialName, content)
+    })
     })
   } catch (e) {
     //@ts-ignore

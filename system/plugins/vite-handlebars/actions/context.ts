@@ -4,7 +4,7 @@ import { ContextOptions } from "../types.ts";
 
 export const createContext = ({
   file = 'context.json',
-  postfix = 'Context',
+  postfix = '-context',
   prefix = '',
   partials
 }: ContextOptions) => {

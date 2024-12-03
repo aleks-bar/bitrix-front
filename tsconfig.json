@@ -31,7 +31,7 @@
       "@shared/*": ["src/templates/shared/*"],
       "@media/*": ["public/media/*"],
       "@fonts/*": ["public/fonts/*"],
-      "@jsHelpers/*": ["src/js/helpers/*"],
+      "@js/*": ["src/js/*"],
     }
   },
   "include": ["src/**/*", "globals.d.ts"],

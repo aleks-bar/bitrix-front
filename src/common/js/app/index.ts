@@ -1,5 +1,5 @@
 import { AppInterface } from "@common/js/app/types.ts";
-import { mqData } from "@jsHelpers/media.ts";
+import { mqData } from "@js/helpers/media";
 
 export const app: AppInterface = {
   bodyBlock( isBlock = true ) {
